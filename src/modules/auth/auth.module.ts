@@ -7,9 +7,14 @@ import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { UserModule } from '../user/user.module';
 
+import { PassportModule } from '@nestjs/passport';
+import { JwtStrategy } from './strategies/jwt.strategy';
+
 @Module({
   imports: [
     UserModule,
+
+    PassportModule,
 
     JwtModule.registerAsync({
       imports: [ConfigModule],
@@ -28,6 +33,6 @@ import { UserModule } from '../user/user.module';
 
   controllers: [AuthController],
 
-  providers: [AuthService],
+  providers: [AuthService, JwtStrategy],
 })
 export class AuthModule {}
