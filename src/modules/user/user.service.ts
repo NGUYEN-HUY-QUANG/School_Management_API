@@ -1,10 +1,13 @@
-import * as bcrypt from 'bcrypt';
-import { Injectable, ConflictException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import * as bcrypt from 'bcrypt';
 import { Repository } from 'typeorm';
 
-import { User } from './entities/user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
+import { User } from './entities/user.entity';
 
 @Injectable()
 export class UserService {
@@ -15,33 +18,30 @@ export class UserService {
 
   async create(dto: CreateUserDto) {
     const existingUser = await this.userRepository.findOne({
-        where: {
+      where: {
         username: dto.username,
-        },
+      },
     });
 
     if (existingUser) {
-        throw new ConflictException('Username already exists');
+      throw new ConflictException('Username already exists');
     }
 
     const hashedPassword = await bcrypt.hash(dto.password, 10);
 
     const user = this.userRepository.create({
-        ...dto,
-        password: hashedPassword,
+      ...dto,
+      password: hashedPassword,
     });
 
-        const savedUser = await this.userRepository.save(user);
+    return this.userRepository.save(user);
+  }
 
-        const { password, ...result } = savedUser;
-
-        return result;
-    }
-    async findByUsername(username: string) {
-        return this.userRepository.findOne({
-            where: {
-            username,
-            },
-        });
-    }
+  async findByUsername(username: string) {
+    return this.userRepository.findOne({
+      where: {
+        username,
+      },
+    });
+  }
 }
