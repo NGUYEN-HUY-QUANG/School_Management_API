@@ -1,36 +1,28 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { UsersModule } from './modules/user/user.module';
 import { AuthModule } from './modules/auth/auth.module';
-import { UserModule } from './modules/user/user.module';
-import { ClassModule } from './modules/class/class.module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({
-      isGlobal: true,
+    ConfigModule.forRoot({ isGlobal: true }),
+    TypeOrmModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (config: ConfigService) => ({
+        type: 'postgres',
+        host: config.get('DB_HOST'),
+        port: +config.get('DB_PORT'),
+        username: config.get('DB_USERNAME'),
+        password: config.get('DB_PASSWORD'),
+        database: config.get('DB_NAME'),
+        autoLoadEntities: true,
+        synchronize: true, // dev only, sau này đổi sang migration
+      }),
     }),
-
-    TypeOrmModule.forRoot({
-      type: 'postgres',
-
-      host: process.env.DB_HOST,
-      port: Number(process.env.DB_PORT),
-
-      username: process.env.DB_USERNAME,
-      password: process.env.DB_PASSWORD,
-      database: process.env.DB_NAME,
-
-      autoLoadEntities: true,
-
-      synchronize: true,
-    }),
-
+    UsersModule,
     AuthModule,
-
-    UserModule,
-
-    ClassModule,
   ],
 })
 export class AppModule {}
