@@ -8,6 +8,7 @@ import { TeachersModule } from './modules/teachers/teachers.module';
 import { ClassesModule } from './modules/classes/classes.module';
 import { StudentsModule } from './modules/students/students.module';
 import { ExamsModule } from './modules/exams/exams.module';
+import { ReportsModule } from './modules/reports/reports.module';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { ExamsModule } from './modules/exams/exams.module';
     ClassesModule,
     StudentsModule,
     ExamsModule,
+    ReportsModule,
   ],
 })
 export class AppModule {}
