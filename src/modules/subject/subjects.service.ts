@@ -4,7 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository , In} from 'typeorm';
 import { Subject } from './entities/subject.etity';
 import { CreateSubjectDto } from './dto/create-subject.dto';
 import { UpdateSubjectDto } from './dto/update-subject.dto';
@@ -34,6 +34,15 @@ export class SubjectsService {
     const subject = await this.subjectRepo.findOne({ where: { id } });
     if (!subject) throw new NotFoundException('Không tìm thấy môn học');
     return subject;
+  }
+
+  async findByIds(ids: string[]): Promise<Subject[]> {
+    if (!ids || ids.length === 0) return [];
+    const subjects = await this.subjectRepo.find({ where: { id: In(ids) } });
+    if (subjects.length !== ids.length) {
+        throw new NotFoundException('Có subjectId không tồn tại');
+    }
+    return subjects;
   }
 
   async update(id: string, dto: UpdateSubjectDto): Promise<Subject> {

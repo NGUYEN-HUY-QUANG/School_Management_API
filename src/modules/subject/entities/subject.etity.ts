@@ -4,7 +4,9 @@ import {
   Column,
   CreateDateColumn,
   UpdateDateColumn,
+  ManyToMany,
 } from 'typeorm';
+import { Teacher } from '../../teachers/entities/teacher.entity';
 
 @Entity('subjects')
 export class Subject {
@@ -12,10 +14,14 @@ export class Subject {
   id: string;
 
   @Column({ unique: true })
-  name: string; // vd: "Toán", "Ngữ văn"
+  name: string;
 
   @Column({ nullable: true })
   description: string;
+
+  // Chiều ngược, không sở hữu bảng join (mappedBy bên Teacher)
+  @ManyToMany(() => Teacher, (teacher) => teacher.subjects)
+  teachers: Teacher[];
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
