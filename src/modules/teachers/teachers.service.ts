@@ -59,6 +59,13 @@ export class TeachersService {
     return teacher;
   }
 
+  async findByUserId(userId: string): Promise<Teacher | null> {
+    return this.teacherRepo.findOne({
+        where: { userId },
+        relations: { subjects: true },
+    });
+  }
+
   async update(id: string, dto: UpdateTeacherDto): Promise<Teacher> {
     const teacher = await this.findOne(id);
 

@@ -8,6 +8,7 @@ import {
   Post,
   Query,
   UseGuards,
+  ForbiddenException,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { StudentsService } from './students.service';
@@ -18,6 +19,7 @@ import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../../common/guards/roles.guard';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { Role } from '../../common/emuns/role.enum';
+import { CurrentUser } from '../../common/decorators/current-user.decorator';
 
 @ApiTags('Students')
 @ApiBearerAuth()
@@ -55,8 +57,15 @@ export class StudentsController {
 
   @Get(':id')
   @Roles(Role.ADMIN, Role.TEACHER, Role.STUDENT)
-  findOne(@Param('id') id: string) {
-    return this.studentsService.findOne(id);
+  async findOne(@Param('id') id: string, @CurrentUser() user: any) {
+    const student = await this.studentsService.findOne(id);
+
+    // STUDENT chỉ được xem hồ sơ của chính mình, không được xem của người khác
+    if (user.role === 'student' && student.userId !== user.id) {
+        throw new ForbiddenException('Bạn không có quyền xem hồ sơ này');
+    }
+
+    return student;
   }
 
   @Patch(':id')

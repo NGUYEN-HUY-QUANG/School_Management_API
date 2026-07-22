@@ -59,6 +59,10 @@ export class StudentsService {
     return this.studentRepo.find({ where: { classId } });
   }
 
+  async findByUserId(userId: string): Promise<Student | null> {
+    return this.studentRepo.findOne({ where: { userId } });
+  }
+
   // Tìm kiếm học sinh theo tên (yêu cầu bắt buộc trong đề bài)
   async search(keyword: string): Promise<Student[]> {
     return this.studentRepo.find({
